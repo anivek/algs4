@@ -3,60 +3,61 @@ import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.StdOut;
 
 public class PercolationStats {
-    private int _dimention;
-    private int _trials;
-    private double[] _threshold;
-    private double _stddev;
-    private double _mean;
+    private final int mDimention;
+    private final int mTrials;
+    private double[] mThreshold;
+    private double mStddev;
+    private double mMean;
 
     public PercolationStats(int n, int trials) {
         if (n <= 0 || trials <= 0)
             throw new IllegalArgumentException();
 
-        _dimention = n;
-        _trials = trials;
-        _threshold = new double[trials];
+        mDimention = n;
+        mTrials = trials;
+        mThreshold = new double[trials];
     }
 
     public double mean() {
-        for (int times = 0; times < _trials; times++) {
-            Percolation percolation = new Percolation(_dimention);
-            //StdOut.println("times: " + times);
+        for (int times = 0; times < mTrials; times++) {
+            Percolation percolation = new Percolation(mDimention);
+
             while (!percolation.percolates()) {
-                int randomSite = StdRandom.uniform(0, _dimention * _dimention);
-                if (percolation.isOpen(randomSite / _dimention, randomSite % _dimention))
+                int randomSite = StdRandom.uniform(0, mDimention * mDimention);
+                if (percolation.isOpen(randomSite / mDimention, randomSite % mDimention))
                     continue;
-                percolation.open(randomSite / _dimention, randomSite % _dimention);
+                percolation.open(randomSite / mDimention, randomSite % mDimention);
             }
 
-            _threshold[times] = (double)percolation.numberOfOpenSites() / (double)(_dimention * _dimention);
+            mThreshold[times] = (double) percolation.numberOfOpenSites() /
+                                (double) (mDimention * mDimention);
         }
 
-        _mean = StdStats.mean(_threshold);
-        StdOut.println("mean                    = " + _mean);
+        mMean = StdStats.mean(mThreshold);
+        StdOut.println("mean                    = " + mMean);
 
-        return _mean;
+        return mMean;
     }
 
     public double stddev() {
-        _stddev = StdStats.stddev(_threshold);
-        StdOut.println("stddev                  = " + _stddev);
+        mStddev = StdStats.stddev(mThreshold);
+        StdOut.println("stddev                  = " + mStddev);
 
-        return _stddev;
+        return mStddev;
     }
 
     public double confidenceLo() {
-        return _mean - (1.96 * _stddev / Math.sqrt(_trials));
+        return mMean - (1.96 * mStddev / Math.sqrt(mTrials));
     }
 
     public double confidenceHi() {
-        return _mean + (1.96 * _stddev / Math.sqrt(_trials));
+        return mMean + (1.96 * mStddev / Math.sqrt(mTrials));
     }
 
     public static void main(String[] args) {
         if (args.length != 2) {
             StdOut.println("incorrect arguments");
-            System.exit(0);
+            return;
         }
 
         try {
@@ -71,7 +72,7 @@ public class PercolationStats {
             StdOut.println("95% confidence interval = [" + confidenceLo + ", " + confidenceHi + "]");
         } catch (NumberFormatException e) {
             StdOut.println("invalid argument format");
-            System.exit(-1);
+            return;
         }
     }
 }

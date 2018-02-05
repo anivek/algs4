@@ -1,14 +1,12 @@
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
     private static final int SITE_BLOCKED = 0;
     private static final int SITE_OPENED = 1;
 
-    private WeightedQuickUnionUF union;
+    private final WeightedQuickUnionUF union;
     private int[] grid;
-    private int dimention = 0;
+    private final int dimention;
     private int numberOfOpenSites = 0;
 
     public Percolation(int n) {
