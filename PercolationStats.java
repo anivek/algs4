@@ -7,9 +7,9 @@ public class PercolationStats {
     private static final double PERCOLATION_CONFIDENCE_VALUE = 1.96;
     private final int mDimention;
     private final int mTrials;
-    private double[] mThreshold;
-    private double mStddev;
-    private double mMean;
+    private final double[] mThreshold;
+    private final double mStddev;
+    private final double mMean;
 
     public PercolationStats(int n, int trials) {
         if (n <= 0 || trials <= 0)
