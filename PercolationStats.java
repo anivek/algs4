@@ -1,8 +1,10 @@
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.StdIn;
 
 public class PercolationStats {
+    private static final double PERCOLATION_CONFIDENCE_VALUE = 1.96;
     private final int mDimention;
     private final int mTrials;
     private double[] mThreshold;
@@ -16,17 +18,15 @@ public class PercolationStats {
         mDimention = n;
         mTrials = trials;
         mThreshold = new double[trials];
-    }
 
-    public double mean() {
         for (int times = 0; times < mTrials; times++) {
             Percolation percolation = new Percolation(mDimention);
 
             while (!percolation.percolates()) {
                 int randomSite = StdRandom.uniform(0, mDimention * mDimention);
-                if (percolation.isOpen(randomSite / mDimention, randomSite % mDimention))
+                if (percolation.isOpen(randomSite / mDimention + 1, randomSite % mDimention + 1))
                     continue;
-                percolation.open(randomSite / mDimention, randomSite % mDimention);
+                percolation.open(randomSite / mDimention + 1, randomSite % mDimention + 1);
             }
 
             mThreshold[times] = (double) percolation.numberOfOpenSites() /
@@ -34,24 +34,23 @@ public class PercolationStats {
         }
 
         mMean = StdStats.mean(mThreshold);
-        StdOut.println("mean                    = " + mMean);
+        mStddev = StdStats.stddev(mThreshold);
+    }
 
+    public double mean() {
         return mMean;
     }
 
     public double stddev() {
-        mStddev = StdStats.stddev(mThreshold);
-        StdOut.println("stddev                  = " + mStddev);
-
         return mStddev;
     }
 
     public double confidenceLo() {
-        return mMean - (1.96 * mStddev / Math.sqrt(mTrials));
+        return mMean - (PERCOLATION_CONFIDENCE_VALUE * mStddev / Math.sqrt(mTrials));
     }
 
     public double confidenceHi() {
-        return mMean + (1.96 * mStddev / Math.sqrt(mTrials));
+        return mMean + (PERCOLATION_CONFIDENCE_VALUE * mStddev / Math.sqrt(mTrials));
     }
 
     public static void main(String[] args) {
@@ -61,11 +60,12 @@ public class PercolationStats {
         }
 
         try {
-            int n = Integer.valueOf(args[0]);
-            int trials = Integer.valueOf(args[1]);
+            int n = Integer.parseInt(args[0]);
+            int trials = Integer.parseInt(args[1]);
+
             PercolationStats percolationStats = new PercolationStats(n, trials);
-            percolationStats.mean();
-            percolationStats.stddev();
+            StdOut.println("mean                    = " + percolationStats.mean());
+            StdOut.println("stddev                  = " + percolationStats.stddev());
 
             double confidenceLo = percolationStats.confidenceLo();
             double confidenceHi = percolationStats.confidenceHi();
