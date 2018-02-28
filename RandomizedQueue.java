@@ -1,28 +1,17 @@
+import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class Deque<Item> implements Iterable<Item> {
+public class RandomizedQueue<Item> implements Iterable<Item> {
+
     private Item[] items;
     private int arraySize;
     private int queueSize;
     private int head;
     private int tail;
 
-    public Deque() {
-        head = 0;
-        tail = 0;
-        arraySize = 1;
-        queueSize = 0;
-        items = (Item[]) new Object[arraySize];
-    }
-
-    public boolean isEmpty() {
-        return queueSize == 0;
-    }
-
-    public int size() {
-        return queueSize;
-    }
 
     private void resizeArray(int newArraySize) {
         Item[] newItems = (Item[]) new Object[newArraySize];
@@ -43,17 +32,14 @@ public class Deque<Item> implements Iterable<Item> {
             if (head <= tail) {
                 newHead = head;
                 newTail = tail;
-
                 System.arraycopy(items, head, newItems, newHead, newTail - newHead + 1);
             } else {
                 newHead = head;
                 newTail = newHead + queueSize - 1;
-
                 System.arraycopy(items, head, newItems, newHead, arraySize - head);
                 System.arraycopy(items, 0, newItems, newHead + arraySize - head, tail + 1);
             }
         }
-
 
         head = newHead;
         tail = newTail;
@@ -61,26 +47,23 @@ public class Deque<Item> implements Iterable<Item> {
         items = newItems;
     }
 
-    public void addFirst(Item item) {
-        int newHead;
-
-        if (item == null)
-            throw new IllegalArgumentException();
-
-        if (queueSize == arraySize)
-            resizeArray(arraySize * 2);
-
-        if (head == 0)
-            newHead = arraySize - 1;
-        else
-            newHead = head - 1;
-
-        items[newHead] = item;
-        head = newHead;
-        queueSize++;
+    public RandomizedQueue() {
+        head = 0;
+        tail = 0;
+        arraySize = 1;
+        queueSize = 0;
+        items = (Item[]) new Object[arraySize];
     }
 
-    public void addLast(Item item) {
+    public boolean isEmpty() {
+        return queueSize == 0;
+    }
+
+    public int size() {
+        return queueSize;
+    }
+
+    public void enqueue(Item item) {
         int newTail;
 
         if (item == null)
@@ -99,11 +82,18 @@ public class Deque<Item> implements Iterable<Item> {
         queueSize++;
     }
 
-    public Item removeFirst() {
+    // remove and return a random item
+    public Item dequeue() {
         if (isEmpty())
             throw new NoSuchElementException();
 
-        Item item = items[head];
+        int randomIndex;
+        if (head > tail)
+            randomIndex = StdRandom.uniform(tail, head + 1);
+        else
+            randomIndex = StdRandom.uniform(head, tail + 1);
+        Item temp = items[randomIndex];
+        items[randomIndex] = items[head];
         items[head] = null;
         head = head == arraySize - 1 ? 0 : head + 1;
 
@@ -111,36 +101,35 @@ public class Deque<Item> implements Iterable<Item> {
         if (queueSize > 0 && queueSize == arraySize / 4)
             resizeArray(arraySize / 2);
 
-        return item;
+        return temp;
     }
 
-    public Item removeLast() {
+    // return a random item (but do not remove it)
+    public Item sample() {
         if (isEmpty())
             throw new NoSuchElementException();
 
-        Item item = items[tail];
-        items[tail] = null;
-        tail = tail == 0 ? arraySize - 1 : tail - 1;
-
-        queueSize--;
-        if (queueSize > 0 && queueSize == arraySize / 4)
-            resizeArray(arraySize / 2);
-
-        return item;
+        int randomIndex;
+        if (head > tail)
+            randomIndex = StdRandom.uniform(tail, head + 1);
+        else
+            randomIndex = StdRandom.uniform(head, tail + 1);
+        return items[randomIndex];
     }
 
     public Iterator<Item> iterator() {
-        return new DequeIterator();
+        return new RandomizedQueueIterator();
     }
 
-    private class DequeIterator implements Iterator<Item>
+    // XXX: need to be randomized
+    private class RandomizedQueueIterator implements Iterator<Item>
     {
         private int current = head;
 
         public boolean hasNext() {
             if (isEmpty())
                 return false;
-            return current != tail + 1;
+            return  current != tail + 1;
         }
 
         public void remove() {
@@ -158,10 +147,6 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     public static void main(String[] args) {
-        Deque<String> deque = new Deque<String>();
 
-        Iterator<String> iterator = deque.iterator();
-        while (iterator.hasNext())
-            StdOut.println("item:" + iterator.next());
     }
 }
