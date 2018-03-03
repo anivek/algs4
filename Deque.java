@@ -158,10 +158,6 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     public static void main(String[] args) {
-        Deque<String> deque = new Deque<String>();
 
-        Iterator<String> iterator = deque.iterator();
-        while (iterator.hasNext())
-            StdOut.println("item:" + iterator.next());
     }
 }
